@@ -1,31 +1,30 @@
 import { StyleSheet, View, Animated, FlatList, Text } from 'react-native';
 import React, { Component } from 'react';
+import axios from 'axios';
 import PulseLoader from '../pulseloader/pulseloader';
-import fetchUserList from '../../utility/networking';
 import ListItem from '../../node_modules/react-native-elements/src/list/ListItem';
 import Header from '../../node_modules/react-native-elements/src/header/Header';
 
-
 const styles = StyleSheet.create({
-  container: {
+  listcontainer: {
     flex: 1,
     backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  mainContainer: {
+  container: {
     flex: 1,
   },
 });
 
-export default class SplashScreen extends Component<{}> {
+export default class MainScreen extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      circles: [],
-      users: [],
-      hideLoader: false,
+      pulsecircles: [],
+      userslist: [],
+      loader: true,
     };
 
     this.counter = 1;
@@ -37,10 +36,10 @@ export default class SplashScreen extends Component<{}> {
 
   componentDidMount() {
     this.setCircleInterval();
-    this.fetchUserList();
+    this.fetchData();
     setTimeout(() => {
       this.setState({
-        hideLoader: true,
+        loader: false,
       });
       clearInterval(this.setInterval);
     }, 3000);
@@ -52,19 +51,23 @@ export default class SplashScreen extends Component<{}> {
   }
 
   addCircle() {
-    this.setState({ circles: [...this.state.circles, this.counter] });
+    this.setState({ pulsecircles: [...this.state.pulsecircles, this.counter] });
     this.counter = this.counter + 1;
   }
 
-  fetchUserList() {
-    fetchUserList(this.pageCount).then((data) => {
-      if (data) {
-        this.maxPageCount = data.total_pages;
+  async fetchData() {
+    const url = `https://reqres.in/api/users?page=`;
+    try {
+      const response = await axios.get(url + this.pageCount);
+      if (response) {
+        this.maxPageCount = response.data.total_pages;
         this.setState({
-          users: this.state.users.concat(data.data),
+          userslist: this.state.userslist.concat(response.data.data),
         });
       }
-    });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
     keyExtractor = (item, index) => index.toString();
@@ -79,15 +82,15 @@ export default class SplashScreen extends Component<{}> {
 
     render() {
       return (
-        <View style={styles.mainContainer}>
+        <View style={styles.container}>
           <Header
-            outerContainerStyles={{ backgroundColor: 'white' }}
-            centerComponent={{ text: 'Users', style: { color: '#000' } }}
+            outerContainerStyles={{ backgroundColor: '#F1F1F1' }}
+            centerComponent={{ text: 'Users', style: { color: '#000', fontSize: 18 } }}
           />
           {
-                    !this.state.hideLoader ?
-                      <View style={styles.container}>
-                        {this.state.circles.map(circle => (
+                    this.state.loader ?
+                      <View style={styles.listcontainer}>
+                        {this.state.pulsecircles.map(circle => (
                           <PulseLoader
                             key={circle}
                           />
@@ -101,16 +104,16 @@ export default class SplashScreen extends Component<{}> {
                                 }}
                         />
                       </View> :
-                      <View style={styles.mainContainer}>
+                      <View style={styles.container}>
                         <FlatList
-                          data={this.state.users}
+                          data={this.state.userslist}
                           showsVerticalScrollIndicator={false}
                           renderItem={this.renderItem}
                           keyExtractor={this.keyExtractor}
                           onEndReached={() => {
                                     if (this.pageCount < this.maxPageCount) {
                                         this.pageCount = this.pageCount + 1;
-                                        this.fetchUserList();
+                                        this.fetchData();
                                     }
                                 }
                                 }
@@ -118,7 +121,7 @@ export default class SplashScreen extends Component<{}> {
                         />
                         {
                                 this.pageCount === this.maxPageCount ?
-                                  <Text style={{ textAlign: 'center', fontSize: 20 }}>No more user to load</Text> : null
+                                  <Text style={{ textAlign: 'center', fontSize: 20, backgroundColor: '#F1F1F1' }}>No more users to load</Text> : null
                             }
                       </View>
                 }

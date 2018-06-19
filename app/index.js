@@ -1,5 +1,5 @@
 import React from 'react';
-import SplashScreen from '../pages/splashscreen/splashscreen';
+import SplashScreen from '../pages/mainScreen/mainscreen';
 
 const App = () => (
   <SplashScreen />
