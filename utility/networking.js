@@ -1,20 +1,18 @@
-/* eslint-disable no-undef */
-// have to disable as it was giving undef to fetch which is globally present for react native
+import axios from 'axios';
+
 const serverUrl = 'https://reqres.in';
 
 const apiFetchUser = `${serverUrl}/api/users?page=`;
 
-export default async function fetchUserList(params) {
+export default function fetchUserList(params) {
   try {
-    const response = await fetch(apiFetchUser + params, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-      },
-    });
-    return await response.json();
+    axios.get(apiFetchUser + params)
+      .then(response => response)
+      .catch((error) => {
+        console.error(error);
+      });
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
   return {};
 }
