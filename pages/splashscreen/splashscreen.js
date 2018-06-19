@@ -1,6 +1,8 @@
 import { StyleSheet, View } from 'react-native';
 import Pulse from 'react-native-pulse';
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+
 
 const styles = StyleSheet.create({
   container: {
@@ -13,8 +15,9 @@ const styles = StyleSheet.create({
 
 export default class SplashScreen extends Component<{}> {
   componentDidMount() {
+    const { navigate } = this.props.navigation;
     setTimeout(() => {
-      this.props.navigation.navigate('UserScreen');
+      navigate('UserScreen');
     }, 3000);
   }
 
@@ -26,3 +29,7 @@ export default class SplashScreen extends Component<{}> {
     );
   }
 }
+SplashScreen.propTypes = {
+  navigation: PropTypes.func.isRequired,
+  navigate: PropTypes.func.isRequired,
+};

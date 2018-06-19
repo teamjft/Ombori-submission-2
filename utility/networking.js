@@ -1,5 +1,5 @@
-import fetch from 'isomorphic-fetch';
-
+/* eslint-disable no-undef */
+// have to disable as it was giving undef to fetch which is globally present for react native
 const serverUrl = 'https://reqres.in';
 
 const apiFetchUser = `${serverUrl}/api/users?page=`;
